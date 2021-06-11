@@ -86,11 +86,40 @@ module Synnex
           .parsed_response
     end
 
+    def customer_users(cust_no)
+      HTTParty.post("#{@endpoint}/webservice/solutions/csp",
+                    body: {
+                        action_name: 'get_customer_users',
+                        snx_eu_no: cust_no
+                    }.to_json,
+                    headers: @headers)
+          .parsed_response["items"]
+    end
 
+    def get_licenses(auth_token, cust_no)
+      HTTParty.post("#{@endpoint}/webservice/solutions/csp/license",
+                    body: {
+                        action_name: 'get_subscribed_sku',
+                        snx_eu_no: cust_no
+                    }.to_json,
+                    headers: {'Authorization' => "Bearer #{auth_token}"}.merge(Synnex::HEADERS))
+          .parsed_response["items"]
+    end
+
+    def endpoint
+      @endpoint
+    end
+
+    def headers
+      @headers
+    end
 
     private
 
+
     def get_auth_token
+      return @access_token if @access_token
+
       body = {
           action_name: "create_access_token",
           user_name: @user_name,

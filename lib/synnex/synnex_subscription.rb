@@ -1,7 +1,7 @@
 module Synnex
   class Subscription
     attr_reader :id, :service_name, :snx_sku_no, :quantity, :status, :po, :price, :msrp, :customer
-    def initialize(json, customer)
+    def initialize(json, api)
       info = json["subscriptions_info"][0]
       @id = info["subscription_id"]
       @service_name = info["service_name"]
@@ -11,7 +11,7 @@ module Synnex
       @po = json["rs_po_no"]
       @price = info["unit_price"]
       @msrp = info["msrp"]
-      @customer = customer
+      @api = api
     end
 
     def change_quantity(qty, email=nil)
@@ -28,7 +28,7 @@ module Synnex
     private
 
     def api
-      customer.msp.api
+      @api
     end
 
   end

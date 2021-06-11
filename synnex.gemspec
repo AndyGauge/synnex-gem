@@ -1,7 +1,7 @@
 
 Gem::Specification.new do |spec|
   spec.name          = "synnex"
-  spec.version       = '0.1.4'
+  spec.version       = '0.1.8'
   spec.authors       = ["Andrew Gauger"]
   spec.email         = ["andygauge@gmail.com"]
 

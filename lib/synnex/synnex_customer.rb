@@ -1,6 +1,6 @@
 module Synnex
   class Customer
-    attr_reader :snx_eu_no, :company_name, :address1, :address2, :city, :state, :zip_code, :country, :contact_name, :email, :phone, :tenant_id, :msp
+    attr_reader :snx_eu_no, :company_name, :address1, :address2, :city, :state, :zip_code, :country, :contact_name, :email, :phone, :tenant_id
     def initialize(json, msp)
       @snx_eu_no = json["snx_eu_no"]
       @company_name = json["company_name"]
@@ -14,12 +14,20 @@ module Synnex
       @email = json["email"]
       @phone = json["phone"]
       @tenant_id = json["tenant_id"]
-      @msp = msp
+      @api = msp.api
     end
 
     def subscriptions
       @subscriptions ||= api.customer_subscription(@snx_eu_no)
-                             .map {|subscription| Synnex::Subscription.new(api.subscription(subscription["subscription_id"]), self)}
+                             .map {|subscription| Synnex::Subscription.new(api.subscription(subscription["subscription_id"]), self.api)}
+    end
+
+    def licenses
+      api.get_licenses(tenant_access_token, @snx_eu_no)
+    end
+
+    def users
+      @users ||= api.customer_users(@snx_eu_no)
     end
 
     # line_items is an array (optional) of the following hash {snx_sku_no: 12345, quantity: 1}
@@ -38,10 +46,20 @@ module Synnex
       response["status"] == "success" ? true : response["message"]
     end
 
+    def api
+      @api
+    end
+
     private
 
-    def api
-      msp.api
+    def tenant_access_token
+      return @token if @token
+      body = {
+          action_name: "create_tenant_access_token",
+          snx_eu_no: @snx_eu_no
+      }.to_json
+      result = HTTParty.post("#{api.endpoint}/webservice/auth/license/token", body: body, headers: api.headers)
+      @token = result.parsed_response['access_token']
     end
   end
 end
