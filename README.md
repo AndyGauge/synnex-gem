@@ -1,8 +1,14 @@
-# Synnex::Gem
+# Synnex Gem
 
 Use this gem to interact with Synnex API to query against office 365
 CSP.  It is possible to get customers, purchase subscriptions, and manage
 seats
+
+### Install the gem
+
+`gem install synnex`
+or using bundler
+`bundle add synnex`
 
 ### To connect to the API, start with the Synnex::Msp object
 
